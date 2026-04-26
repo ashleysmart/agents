@@ -1,0 +1,108 @@
+# Overview
+
+Evaluate the code based on the following aspects:
+ - Code quality and adherence to {{language}} best practices
+ - Potential bugs or unhandled edge cases
+ - Performance optimizations
+ - Readability and maintainability
+ - Any security vulnerabilities
+
+# Output
+
+In your output:
+ - Begin with a brief summary of the overall code quality
+ - Line numbers start at 1, based on the code as presented
+ - If no issues are found, briefly state that the code meets best practices
+ - the checklist
+
+
+# Lint and test
+
+Detect the language from changed files and run the matching checks. See `tooling/TOOLING.md` / `tooling/TOOLING_<lang>.md` for per-language commands.
+
+- Fix all lint and format errors before proceeding
+- Ignore pre-existing typecheck errors in untouched files
+- Read @TESTING.md for a specific test list
+
+# Checklist
+
+- Big file checkins
+    - check for large files that dont use LFS
+- Hard coding:
+    - is there any hard coded inline constants or magic numbers
+- Logic Check: 
+    - Does it actually do what the micro spec asked for
+- No Breakage: 
+    - Did it accidentally break or delete existing code and features
+- Clean Naming: 
+    - Are variables named using the standard
+- Security: 
+    - Any hardcoded keys or "test" passwords left in?
+    - Does the API clean inputs?
+- Error Handling: 
+    - Is error handling present
+    - is the API robust to failure
+    - is the API robust to null/empty inputs 
+    - is the APU robust to input over flow 
+    - does the API report a clean and specifci error for the user to deal with 
+    - Does the  API leave the system in a half state or correctly recover the failed operation
+- Readability: 
+    - Is the code easy to follow, or is it a "spaghetti" mess?
+    - Is the function size limited 
+    - Is the code logicilly divided. IE the function/class should:
+        - contain code that has a Single clear responsibility 
+        - or is a data/control flow for a series of calls to SRP style functions with minual glue logic between the calls 
+    - is the code modular for reuse
+- Design
+    - does the code meet the SOLID principles
+        - Single Responsibility: A class should have only one reason to change.
+        - Open-Closed: interfaces/class should be open for extension but closed for modification.
+        - Liskov Substitution: Subtypes must be completely substitutable for their base types.
+        - Interface Segregation: code should be forced to depend on methods it does not use.
+        - Dependency Inversion: Depend on abstractions, not on concrete implementations.
+    - Does the code use a fail early approach to check for errors before starting changes
+- Reuse
+    - does the change perference reuse and not just copy existing code for minor changes?
+    - would the design/plan have been better if a generalize module was extracted for everyone to use instead of inline it all
+- Performance: 
+    - Does the code run fast
+    - Does the code do unnecessary loops or repeat the same sub tasks over and over 
+    - does the code use fail early/preflight checks to reduce cpu and memory usage
+- thread safety and blocking 
+    - do we use calls that will block the API eg time.Sleep or a request to another service that takes time to come back
+    - are there race conditions in the code
+- UI sanity: 
+    - Does the UI/UX look and feel right?
+    - Are componetents actually visable to a user?
+    - does the design work right on mobile and destop
+    - Are loaders/spinners shown so the user isn't guessing?
+    - does the UI correctly update when changes occur or doees it go stale?
+    - What does the UI look like when there is zero data to show?
+- Comments: 
+    - are there explainations of complex parts?
+    - is there a one line summary comment of what the code will try to do for the next 10-20 lines
+- Ready to Ship: 
+    - Is it 100% finished and not a "placeholder" block?
+    - grep for WIP, TODO, TDB and other im not done comments 
+- Dead code
+    - is there blocks of cut off unreavable code 
+    - is there "for the future" blocks of code from halluations that where never used yet
+    - "ghost" code and ghost imports?
+- Dependency Audit:
+    - are the included libraries used? 
+    - is the import ordered so that a future code change will show minual diff
+- Logging & Observability:
+    - Does it log meaningful info for debugging?
+    - Does it log meaningful trace info for health monitoring
+    - Does it log meaningful performance metrics 
+- State Management:
+    - Does it leave "stale" data in the UI or state after an action?
+    - does the zeroth state work or fail
+Idempotency:
+    - If the user clicks "Submit" twice, does it create two records or break the DB?
+Local files:
+    - Does it rely on a local file or path that won't exist in production?
+    - are all files commited to the PR
+Type Safety:
+    - were types correct. did it just stick any everywhere    
+    - where structs of data validated 
