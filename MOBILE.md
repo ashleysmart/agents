@@ -1,6 +1,6 @@
 # Mobile Mode
 
-This file inherits `/home/kage/agents/AGENTS.md`.
+This file inherits `AGENTS.md`.
 
 If this file conflicts with `AGENTS.md`, this file wins for mobile tasks.
 
@@ -42,7 +42,7 @@ When the user says mobile mode is active, treat the task as mobile-first by defa
 
 ### 5. Response and execution style
 
-- Keep responses verbose and to the point.
+- Keep responses concise and to the point.
 - Attempt to run code or commands for the user when practical instead of only describing what to do.
 - Assume the user may be voice typing and interpret likely swapped or autocorrected words before asking for clarification.
 - Keep commands tight without extra whitespace or decorative formatting.

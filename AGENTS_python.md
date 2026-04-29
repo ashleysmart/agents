@@ -1,4 +1,10 @@
-# agents.md
+# AGENTS_python.md
+
+This file inherits `AGENTS.md`.
+
+If this file conflicts with `AGENTS.md`, this file wins for Python tasks.
+
+---
 
 ## Purpose
 
