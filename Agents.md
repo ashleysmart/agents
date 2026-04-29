@@ -239,12 +239,6 @@ An agent must stop and surface an open question rather than guess when:
 - An interface from another module is missing or contradicts the spec.
 - The 97 % coverage target cannot be reached without unreasonable stubbing.
 
-### Response style
-
-- Keep responses short and to the point.
-- Prefer direct answers over long explanations.
-- Include only the detail needed for the current task unless the user asks for more.
-
 ---
 
 ## 6. What Agents Must Never Do
@@ -264,3 +258,43 @@ and ask. Violations erode trust and create hidden regressions.
 - **Do not add comments or documentation** to code that was not part of the
   change, even to "improve" it.
 - **Do not change formatting** in lines that were not otherwise modified.
+- **Do not upgrade dependencies** unless that is the stated task.
+- **Do not create new files** (helpers, utilities, constants, types) that
+  the spec does not call for.
+- **Do not expand the test suite** beyond the acceptance criteria in the
+  spec — extra tests can be proposed but not committed without approval.
+
+If during implementation an agent notices something that *should* be fixed
+but is out of scope, it must surface it as a note at the end of the task
+and wait for explicit instruction before acting.
+
+### Unsupported assertions
+
+An agent must never state a claim — about code behaviour, system state, test
+results, interface contracts, or anything else — without first gathering the
+evidence that supports it and printing that evidence in the response.
+
+Rules:
+
+- Evidence must be gathered **before** the claim is made, not assumed in
+  advance and verified later.
+- The raw evidence must be **printed in full** in the response alongside the
+  claim — a reference alone is not sufficient.
+- Acceptable evidence forms:
+  - File content: quote the exact lines read, with file path and line numbers.
+  - Command output: print the full stdout/stderr of the command that was run.
+  - Spec reference: quote the exact section text, with heading and line number.
+  - Test result: print the full pass/fail output of the test run.
+- If the required evidence cannot be gathered, the agent must say so
+  explicitly and flag the claim as an unverified assumption requiring
+  confirmation before acting on it.
+
+### Other hard prohibitions
+
+- Modify lock files without being asked.
+- Add a runtime dependency that is not in the micro spec.
+- Delete or skip a test to make coverage pass.
+- Suppress linter or type-checker warnings without a comment explaining why.
+- Push to `main` directly.
+- Amend a commit that has already been pushed.
+- Guess at an interface — always read the source or the spec first.
