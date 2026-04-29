@@ -239,6 +239,12 @@ An agent must stop and surface an open question rather than guess when:
 - An interface from another module is missing or contradicts the spec.
 - The 97 % coverage target cannot be reached without unreasonable stubbing.
 
+### Response style
+
+- Keep responses short and to the point.
+- Prefer direct answers over long explanations.
+- Include only the detail needed for the current task unless the user asks for more.
+
 ---
 
 ## 6. What Agents Must Never Do
