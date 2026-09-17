@@ -20,14 +20,15 @@ from pathlib import Path
 TASKING_FILE = "agent_tasking.md"
 DIR_NAME_RE = re.compile(r"^\d{8}-[a-z0-9][a-z0-9-]*$")
 HEADING_RE = re.compile(r"^(#{1,3})\s+(.*\S)\s*$")
-CHECK_ID_RE = re.compile(r"^- \[[ x]\] \**([RUTAXS])(\d+)\b")
+CHECK_ID_RE = re.compile(r"^- \[[ x]\] \**([RTS])(\d+)\b")
 TRACKER_RE = re.compile(r"\bDONE\b|\bStatus:|\bREVERTED\b|NOT IMPLEMENTED|at spec phase")
 LINE_NUMBER_REF_RE = re.compile(r"\b[\w./-]+\.[A-Za-z]{1,5}:\d+\b")
 
-LAYOUT = ["problem", "requirements", "scope", "implementation approach", "implementation tasks", "acceptance criteria", "verification", "related"]
+LAYOUT = ["problem", "objective", "requirements", "scope", "acceptance criteria", "verification", "related"]
+OPTIONAL = {"terms": "objective"}  # optional section -> the required section it follows
 SPEC_FILE = "microspec.md"
-AGENT_SECTIONS = ["task breakdown", "test plan", "security checklist"]
-TASKING_REQUIRED = ["task breakdown", "test plan", "security checklist"]
+AGENT_SECTIONS = ["implementation approach", "implementation tasks", "test plan", "security checklist"]
+TASKING_REQUIRED = ["implementation approach", "implementation tasks", "test plan", "security checklist"]
 HUMAN_ONLY_SECTIONS = ["requirements", "acceptance criteria"]
 DEFAULT_S = [f"S{i}" for i in range(1, 11)]
 
@@ -102,7 +103,7 @@ def dot_point_checks(path, lines, violations):
 
 
 def validate_layout(path, violations):
-    """Every human spec file: What/When/Owner header, the eight sections in order, and their contents."""
+    """Every human spec file: What/When/Owner header, the seven required sections in order (plus optional ones), and their contents."""
     lines = path.read_text(encoding="utf-8").splitlines()
     sections = parse_sections(lines)
     for key in ("What", "When", "Owner"):
@@ -110,18 +111,22 @@ def validate_layout(path, violations):
         if n != 1:
             violations.append(Violation(path, f"header must carry '**{key}:** <text>' exactly once before '## Problem' (found {n}) (HUMAN_SPECS.md § Every tier)"))
     names = [name for name, level, _ in sections if level == 2]
-    if names != LAYOUT:
+    required = [n for n in names if n not in OPTIONAL]
+    if required != LAYOUT:
         violations.append(Violation(path, f"sections must be exactly {[n.title() for n in LAYOUT]} in order (found: {[n.title() for n in names]}) (HUMAN_SPECS.md § Layout)"))
+    for name, after in OPTIONAL.items():
+        if name in names and after in names and names.index(name) != names.index(after) + 1:
+            violations.append(Violation(path, f"optional section '{name}' must come directly after '{after}' (HUMAN_SPECS.md § Layout)"))
     for key in ("Decision", "Success"):
-        if not field_lines(section_body(sections, "problem"), key):
-            violations.append(Violation(path, f"Problem must carry '**{key}:**'"))
+        if not field_lines(section_body(sections, "objective"), key):
+            violations.append(Violation(path, f"Objective must carry '**{key}:**' (HUMAN_SPECS.md § Layout)"))
+    if field_lines(section_body(sections, "problem"), "Decision"):
+        violations.append(Violation(path, "Problem states what is wrong; '**Decision:**' belongs in Objective"))
     scope = "\n".join(section_body(sections, "scope")).lower()
     if "out of scope" not in scope:
         violations.append(Violation(path, "Scope must state what is out of scope"))
     if "boundary" not in scope:
         violations.append(Violation(path, "Scope must state the boundary — which modules change and which do not"))
-    if "alternative" not in "\n".join(section_body(sections, "implementation approach")).lower():
-        violations.append(Violation(path, "Implementation approach must name the alternatives considered and why not"))
     r_ids = check_ids(section_body(sections, "requirements"), "R")
     if not r_ids:
         violations.append(Violation(path, "Requirements — expected '- [ ] **R<n> — <title>:** ...' lines"))
@@ -153,11 +158,13 @@ def validate_tasking_file(path, spec_r_ids, violations):
     for kw in HUMAN_ONLY_SECTIONS:
         if has_section(sections, kw):
             violations.append(Violation(path, f"section '{kw}' is human-authored and belongs in the spec — the tasking file references R<id>, it does not restate them"))
-    a_ids = check_ids(lines, "A")
-    if not a_ids:
-        violations.append(Violation(path, "no task breakdown — expected '- [ ] A<n>: ...' lines"))
-    elif len(a_ids) != len(set(a_ids)):
-        violations.append(Violation(path, "duplicate A ids"))
+    if "alternative" not in "\n".join(section_body(sections, "implementation approach")).lower():
+        violations.append(Violation(path, "Implementation approach must name the alternatives considered and why not (AGENT_TASKING.md § Implementation approach)"))
+    t_ids = check_ids(lines, "T")
+    if not t_ids:
+        violations.append(Violation(path, "no implementation tasks — expected '- [ ] **T<n> — <name>** ...' lines"))
+    elif len(t_ids) != len(set(t_ids)):
+        violations.append(Violation(path, "duplicate T ids"))
     present_s = {f"S{i}" for i in check_ids(lines, "S")}
     missing_s = [s for s in DEFAULT_S if s not in present_s]
     if missing_s:

@@ -25,25 +25,31 @@ The human spec convention the agent expects, reads, and checks. The scaffold is 
 
 - Opens with the three questions, one dot point each under the title, before `## Problem`: `- **What:** <what ships>`, `- **When:** <date>`, `- **Owner:** <who>`.
   - A spec that cannot answer them is a draft.
-- Answers, before review: who the user is, what problem this solves, the alternatives and why not those, how success is measured.
+- Answers, before review: who the user is, what problem this solves, how success is measured.
 - Requirements describe outputs and outcomes from the user's perspective, not the implementation.
+- States what is required, never how to do the job — the approach, the alternatives and why not those, and the task list are the agent's, in `agent_tasking.md`.
 - Statements follow SOLID, open/closed in particular: what this change adds or does, not the module's inventory (`~/agents/style/DOT_POINT_SRP.md` § SOLID statements).
-- Durable references: full repo paths, function and class names; no line numbers.
+- Code references are quick-ref (`~/agents/style/QUICK_REF.md`).
 - Written in terse-srp-dot-point style (`~/agents/style/DOT_POINT_SRP.md`): every line under a heading is a `-` dot point, one clause per line, sub-clauses nested; no paragraphs, no hand-wrapped prose.
 
 ## Layout
 
-`microspec.md` carries these eight sections, in this order, each a `##` heading. A micro-tier spec keeps each section to a line or two; larger tiers fill them.
+`microspec.md` carries these sections, in this order, each a `##` heading — seven required, plus the optional `## Terms`. A micro-tier spec keeps each section to a line or two; larger tiers fill them.
 
-1. `## Problem` — dot points: the observed problem, then `- **Decision:**` (chosen direction) and `- **Success:**` (measurable outcome).
-2. `## Requirements` — `- [ ] **R<n> — <title>:** <specific, testable behaviour>`; one per line; error and edge behaviour get their own `R<n>`.
-3. `## Scope` — in scope; `Out of scope:` what is not built; `Boundary:` which modules change and which do not.
+1. `## Problem` — dot points: what is wrong, observed. What is aimed at goes in `## Objective`, not here.
+2. `## Objective` — what is aimed at about the problem: `- **Decision:**` (chosen direction) and `- **Success:**` (measurable outcome).
+   - The direction, not the method — how it is built is the agent's, in `agent_tasking.md`.
+3. `## Terms` — optional; directly after `## Objective` when present: `- **<term>:** <what it means here>`, one per line.
+   - Only for a word the spec leans on whose meaning is not obvious or is used in a narrower sense than usual.
+   - Not a dictionary of the domain — a term nobody would misread does not earn a line.
+4. `## Requirements` — `- [ ] **R<n> — <title>:** <specific, testable behaviour>`; one per line; error and edge behaviour get their own `R<n>`.
+5. `## Scope` — in scope; `Out of scope:` what is not built; `Boundary:` which modules change and which do not.
    - A change that crosses the boundary — an "extension" that rewrites core — is a large divergence; the agent asks.
-4. `## Implementation approach` — the existing component reused and the minimal change; the material trade-off or rollback; `Alternatives:` the other ways considered and why not, one line each — the minimal fix is one of them.
-5. `## Implementation tasks` — `- [ ] **T<n> — <name>** - <description>` with `Depends on` and `Verification` sub-lines — no time estimates. Proposed by the agent from its tasking file, written on the human's approval.
 6. `## Acceptance Criteria` — `- [ ] AC<n>: <observable pass/fail fact>`, each citing the `R<n>` it proves; every requirement has at least one; each derives at least one test at implementation (`AGENT_TASKING.md` § Acceptance criteria are guides, not inventories).
 7. `## Verification` — one dot point per check, with its expected result.
 8. `## Related` — one dot point per overlapping or upstream spec; `- none` when there are none.
+
+- How the job is done is not the spec's business — the approach and the task list are the agent's, in `agent_tasking.md` (`AGENT_TASKING.md` § Implementation approach, § Implementation tasks).
 
 ## Authorship
 
@@ -60,7 +66,7 @@ The human spec convention the agent expects, reads, and checks. The scaffold is 
   - What changed and when → git history of the spec file.
   - Why a direction was chosen or reversed → `task.md` `# DECISIONS` (`~/agents/review/TASK_FILE.md`).
   - Review claims and their outcomes → the review store (`~/agents/review/ISSUE_TRACKING.md`).
-  - Implementation progress → checkbox state on `R<n>` / `T<n>` lines; the agent's `A<n>` lines in `agent_tasking.md`.
+  - Implementation progress → checkbox state on `R<n>` / `AC<n>` lines; the agent's `T<n>` lines in `agent_tasking.md`.
 - Tracking surfaces are checkbox flips, not prose annotations.
 
 ## Validation

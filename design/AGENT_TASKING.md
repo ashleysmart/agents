@@ -8,7 +8,7 @@ Agent rules for the tasking file. The human spec's convention — tiers, locatio
 - Capture the acceptance requirements.
 - The spec is where the problem is thought through before building — not a task brief for an agent.
   - It states what is being solved, what is assumed, where the boundary is, and how success is measured.
-  - It names the alternatives considered and why they were not chosen.
+  - It never states how the job is done — the approach, the alternatives and why not, and the tasks are the tasking file's (§ Implementation approach, § Implementation tasks).
 - Written in terse-srp-dot-point style (`~/agents/style/DOT_POINT_SRP.md`): every line under a heading is a `-` dot point, one clause per line, sub-clauses nested; no paragraphs, no hand-wrapped prose.
 - The spec is **not** a code-in-text-form document.
   - It does not perfectly represent the exact code that is written.
@@ -20,9 +20,7 @@ Agent rules for the tasking file. The human spec's convention — tiers, locatio
   - It does not enumerate the module's full set of behaviours — that inventory goes stale when parallel work lands on the same module.
   - GOOD: "`RecordAdapter` will add `browse(cursor)`".
   - BAD: "`RecordAdapter` has `create`, `browse`".
-- Use durable references.
-  - Do not use line numbers — they go stale.
-  - Use full repo paths for filenames.
+- Code references are quick-ref (`~/agents/style/QUICK_REF.md`), or code-snip (`~/agents/style/CODE_SNIP.md`) where a claim rests on the code.
 
 ## Authorship
 
@@ -30,28 +28,32 @@ Agent rules for the tasking file. The human spec's convention — tiers, locatio
   - The agent drafts from the human's words, near-verbatim, formatted into the tier shape; it shows the draft and writes on approval.
   - Allowed: grammar, spelling, expanding shorthand, placing text under the right heading.
   - Not allowed: rephrasing, summarising, or adding content the human did not say — no invented requirements, design, or alternatives.
-- The agent's own analysis goes in the tasking file (§ Tasking file).
+- The agent's own analysis goes in the tasking file (§ Tasking file) — the approach, the alternatives, and the task list are the agent's, never the spec's.
 - A gap or conflict in the spec → the agent asks; the human supplies the words.
 
 | # | Section | Lives in | Author | Agent rule |
 |---|---|---|---|---|
-| 1 | Requirements | Spec | Human | Human's words. Missing or empty → tasking does not start; ask. |
-| 2 | Design | Spec | Human | Human's words. Missing → the agent proposes one in the tasking file and asks. |
-| 3 | Use cases — summary | Spec | Human | Human's words. Numbered checklist (`U<id>`). |
-| 4 | Use cases — detail | Spec | Human | Human's words. |
-| 5 | Task breakdown — summary | Tasking file | Agent | Numbered checklist (`A<id>`). Ordered by dependency. Human reads end to end before work starts. |
-| 6 | Task breakdown — detail | Tasking file | Agent | Expanded task descriptions with modules, tests, dependencies. |
-| 7 | Test plan | Tasking file | Agent | Derive from requirements. Human reads for completeness. |
-| 8 | Security checklist | Tasking file | Agent | Agent checks before completion. Human verifies. |
-| 9 | Acceptance checklist | Spec | Human | Human's words. |
-| 10 | References | Spec | Human | Human's words. Append-only. |
+| 1 | Problem | Spec | Human | Human's words — what is wrong. Missing or empty → tasking does not start; ask. |
+| 2 | Objective | Spec | Human | Human's words — `**Decision:**` and `**Success:**`. Missing → ask. |
+| — | Terms | Spec | Human | Optional. Human's words. Defines a term the spec leans on. |
+| 3 | Requirements | Spec | Human | Human's words. Numbered checklist (`R<id>`). Missing or empty → tasking does not start; ask. |
+| 4 | Scope | Spec | Human | Human's words. Missing boundary → ask. |
+| 5 | Acceptance Criteria | Spec | Human | Human's words. Numbered checklist (`AC<id>`). |
+| 6 | Verification | Spec | Human | Human's words. |
+| 7 | Related | Spec | Human | Human's words. Append-only. |
+| 8 | Implementation approach | Tasking file | Agent | The reuse, the minimal change, the trade-off, the alternatives and why not. |
+| 9 | Implementation tasks | Tasking file | Agent | Numbered checklist (`T<id>`). Ordered by dependency. Human reads end to end before work starts. |
+| 10 | Test plan | Tasking file | Agent | Derive from requirements. Human reads for completeness. |
+| 11 | Security checklist | Tasking file | Agent | Numbered checklist (`S<id>`). Agent checks before completion. Human verifies. |
+
+- Ids: `R` requirement and `AC` acceptance criterion in the spec; `T` task and `S` security check in the tasking file.
 
 ## Tasking file
 
 - The tasking file ("tasking") is the agent's spec — the spec document the agent writes: `specs/<YYYYMMDD>-<slug>/agent_tasking.md`, beside the human spec (`HUMAN_SPECS.md` § File location).
 - The agent owns it; humans read and approve it.
-- It references the human spec by `R<id>` / `U<id>`; it does not restate requirements.
-- It holds the agent-authored sections (5–8) and the agent's derived artifacts, including:
+- It references the human spec by `R<id>` / `AC<id>`; it does not restate requirements.
+- It holds the agent-authored sections (8–11) and the agent's derived artifacts, including:
   - Gap assumptions (`CODER.md` §1).
   - The input-state × behaviour matrix when the spec lacks one (P1).
   - The anti-pattern check (P3).
@@ -67,43 +69,49 @@ Agent rules for the tasking file. The human spec's convention — tiers, locatio
 
 ## Tasking file sections
 
-The agent-authored sections. Human sections (requirements, design, use cases, acceptance checklist, references) are `HUMAN_SPECS.md`.
+The agent-authored sections. The human sections — problem, objective, requirements, scope, acceptance criteria, verification, related — are `HUMAN_SPECS.md`.
 
-### 5. Task breakdown — summary (agent — tasking file)
+### 8. Implementation approach (agent — tasking file)
 
-Terse checklist of implementation steps, numbered for tracking. One line per task, ordered by dependency — foundations first.
+How the job gets done. The spec states what is required; this states the way there.
+
+- The existing component reused and the minimal change on top of it.
+- The material trade-off, and the rollback if it goes wrong.
+- `Alternatives:` the other ways considered and why not, one line each — the minimal fix is one of them.
+
+### 9. Implementation tasks (agent — tasking file)
+
+Checklist of implementation steps, numbered for tracking. One line per task, ordered by dependency — foundations first. No time estimates.
 
 Format:
 
 ```markdown
-- [ ] A1: Split monolithic controller into domain-specific packages (depends: —)
-- [ ] A2: Extract Knative Service template builder (depends: A1)
-- [ ] A3: Add Binding type to CRD (depends: A1)
+- [ ] **T1 — Split monolithic controller into domain-specific packages** - <what changes>
+  - Files: <modules affected>
+  - Depends on: —
+  - Verification: <what proves it done>
+- [ ] **T2 — Extract Knative Service template builder** - <what changes>
+  - Files: <modules affected>
+  - Depends on: T1
+  - Verification: <what proves it done>
 ```
 
-Each task references its dependencies. One commit per task. The summary is the progress tracker.
+- Every sub-line is a nested dot point — `/check-spec` rejects indented prose continuations.
 
-### 6. Task breakdown — detail (agent — tasking file)
+One commit per task. The checklist is the progress tracker.
 
-Expanded description for each task listed in the summary.
-
-- What changes
-- Which module/files are affected
-- What tests verify completion
-- Dependencies explained
-
-### 7. Test plan (agent — tasking file)
+### 10. Test plan (agent — tasking file)
 
 Every requirement is covered. The plan is a floor, not a ceiling — implementation derives more tests than it names (see § Acceptance criteria are guides, not inventories).
 
 - Every requirement has at least one test.
 - The plan names groups of testing, never the test inventory.
 - Happy path per requirement
-- Error cases from section 1
+- Error cases from the spec's requirements
 - Boundary conditions: zero, one, max
 - Design-mandated test constraints and pins earn a line; routine case enumeration does not.
 
-### 8. Security checklist (agent — tasking file; human verifies)
+### 11. Security checklist (agent — tasking file; human verifies)
 
 Agent checks these before marking work complete. Human verifies during review. Numbered for tracking.
 
@@ -160,8 +168,8 @@ Add project-specific items from `@review/SECURITY_REVIEW.md` when applicable. Co
   - What changed and when → git history of the spec file.
   - Why a direction was chosen or reversed → `task.md` `# DECISIONS` (`review/TASK_FILE.md`).
   - Review claims and their outcomes → the review store `<ID>.md` files (ISSUE_TRACKING.md).
-  - Implementation progress → the task breakdown checkboxes (`A<id>`) in the tasking file, checkbox state only.
-- The tracking surfaces are the numbered checklists — R/U/X in the spec, A/S in the tasking file — checkbox flips, not prose annotations.
+  - Implementation progress → the implementation-task checkboxes (`T<id>`) in the tasking file, checkbox state only.
+- The tracking surfaces are the numbered checklists — R/AC in the spec, T/S in the tasking file — checkbox flips, not prose annotations.
 
 ## Rules
 

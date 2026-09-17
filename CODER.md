@@ -29,7 +29,7 @@ Rules and expectations for all AI agents working in this repository tree. These 
 
 ### The tasking file — what the agent writes
 
-- The tasking file is the agent's spec: task breakdown (`A<id>`), test plan, security checklist, gap assumptions, the P1 matrix when the spec lacks one, the P3 check, the AC → test mapping, open questions (`design/AGENT_TASKING.md` § Tasking file).
+- The tasking file is the agent's spec: implementation approach, implementation tasks (`T<id>`), test plan, security checklist, gap assumptions, the P1 matrix when the spec lacks one, the P3 check, the AC → test mapping, open questions (`design/AGENT_TASKING.md` § Tasking file).
 - Every task with blast radius (`design/HUMAN_SPECS.md` § Whether and which spec) has both documents **before** any code.
 - No code is written until the human spec exists and the tasking file is committed and explicitly approved (§5 Two phases).
 - The tasking file references the spec by `R<id>`; it does not restate requirements.
@@ -355,13 +355,14 @@ SOLID applies to statements too — docs, specs, PR descriptions, commit message
 
 | # | Gate | Evidence |
 |---|------|----------|
-| S1 | **The published checklists actually execute, with artifacts.** `~/agents/review/REVIEW_METHOD.md` every PR; `~/agents/review/SECURITY_REVIEW.md` check groups whenever the diff touches APIs/auth/credentials; `~/agents/reference/anti-patterns/CHECKLIST.md` against the diff. Each produces a filled item → pass/fail/N-A → `file:line` record. No artifact = didn't happen. | Checklist output files with `file:line` evidence for every item. |
+| S1 | **The published checklists actually execute, with artifacts.** `~/agents/review/REVIEW_METHOD.md` every PR; `~/agents/review/SECURITY_REVIEW.md` check groups whenever the diff touches APIs/auth/credentials; `~/agents/reference/anti-patterns/CHECKLIST.md` against the diff. Each produces a filled item → pass/fail/N-A → durable reference. No artifact = didn't happen. | Checklist output files: code-snip (`style/CODE_SNIP.md`) for every failed item, quick-ref (`style/QUICK_REF.md`) for the rest. |
 | S2 | **Findings map to objectives before they map to fixes.** Every review finding is classified on-objective / robustness-layer / out-of-scope before any code is written; robustness layers default to rejected pending user decision. | Classification tag on each finding before implementation begins. |
 | S3 | **Fresh state before verdicts.** Reviews and fixes run against the current HEAD after fetch — never against a stale checkout. | `git fetch` + `HEAD` SHA recorded before each review or fix pass. |
 
 ### Reporting findings
 
-- Report bugs, issues, and findings **to the user in chat** using the finding grammar in [`~/agents/review/REVIEW_METHOD.md` § Finding Grammar](review/REVIEW_METHOD.md#finding-grammar): one line per finding, `- [<x| >] <ID> - <STATUS> [<SEVERITY>] - <title> \`file:line\``.
+- Report bugs, issues, and findings **to the user in chat** using the finding grammar in [`~/agents/review/REVIEW_METHOD.md` § Finding Grammar](review/REVIEW_METHOD.md#finding-grammar): one line per finding.
+  - Code references follow `style/QUICK_REF.md` and `style/CODE_SNIP.md`; the chat form is their chat exception.
 - Use the status tokens only (`OPEN`, `NEEDS_REVIEW:coder`, `CLOSED verified:<yyyy-mm-dd>`, …). **Never** describe a finding with a loose adjective like "present", "resolved", "done", or "handled".
 - A fix that is written but not yet verified is `OPEN`, not `CLOSED verified:` — "verified" requires a passing reverify command, test, or trace, not merely that the code is present.
 - Do **not** write to `review.md` or the `~/reviews/<repo>-pr-<number>/` directory. That persisted store is the reviewer/orchestrator's job (see `~/agents/review/ISSUE_TRACKING.md`). Your report is the in-chat list.
@@ -434,7 +435,7 @@ An agent surfaces an open question rather than guessing — at the end of a turn
 
 ### Scope creep
 
-- The micro spec is the scope. Every change, test, and review fix traces to a spec line (`R<id>`, `A<id>`, an acceptance criterion) or an in-scope red-lighted claim — nothing else lands.
+- The micro spec is the scope. Every change, test, and review fix traces to a spec line (`R<id>`, `AC<id>`) or a tasking-file task (`T<id>`), or an in-scope red-lighted claim — nothing else lands.
 - Scope-check feedback first and fast: every review claim, PR comment, or suggestion is checked against the micro spec before any trace or fix (§5 triage).
   - In scope → proceed.
   - Out of scope → `OUT_OF_SCOPE` with the reason, listed as a follow-up in the summary; not fixed in this change.

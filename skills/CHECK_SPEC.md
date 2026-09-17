@@ -14,11 +14,11 @@ Checks a spec directory against `~/agents/design/HUMAN_SPECS.md` (the human spec
    ```bash
    python3 ~/agents/scripts/validate_spec.py <spec-dir>
    ```
-   It checks `microspec.md`: the `What` / `When` / `Owner` header; the eight sections in order — Problem (with Decision / Success), Requirements `R<n>`, Scope (out of scope, boundary), Implementation approach (alternatives), Implementation tasks, Acceptance Criteria `AC<n>` citing every `R<n>`, Verification, Related; tracker markers; line-number citations. When `agent_tasking.md` is present: required sections, `A<id>` lines, `S1–S10`, every spec `R<id>` referenced, no restated human sections.
+   It checks `microspec.md`: the `What` / `When` / `Owner` header; the seven required sections in order — Problem (what is wrong), Objective (Decision / Success), the optional Terms directly after it, Requirements `R<n>`, Scope (out of scope, boundary), Acceptance Criteria `AC<n>` citing every `R<n>`, Verification, Related; no agent-authored section; tracker markers; line-number citations. When `agent_tasking.md` is present: required sections, Implementation approach (alternatives), `T<id>` lines, `S1–S10`, every spec `R<id>` referenced, no restated human sections.
 3. Judgment pass — read the tier file end to end and check what the script cannot:
    - Requirements state outputs and outcomes from the user's perspective, not implementation (HUMAN_SPECS.md § Every tier).
    - Statements are open/closed — what the change adds, not the module inventory — and free of hyperbole (`style/DOT_POINT_SRP.md` § SOLID statements).
-   - Alternatives name the minimal fix and say why not.
+   - Alternatives name the minimal fix and say why not — in the tasking file, never the spec.
    - The boundary matches the tier: a micro spec that touches core, the data model, or more than one service is a tier mismatch (HUMAN_SPECS.md § Whether and which spec).
    - No code-in-text-form: no test inventories, no line-by-line implementation (AGENT_TASKING.md § Acceptance criteria are guides, not inventories).
    - Dot-point SRP style: one clause per line, no hand-wrapped prose.

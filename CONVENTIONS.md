@@ -38,7 +38,7 @@ specs/<YYYYMMDD>-<slug>/agent_tasking.md
 
 ### Required sections
 
-Layout: `design/HUMAN_SPECS.md` § Layout — a What / When / Owner header, then `## Problem`, `## Requirements`, `## Scope`, `## Implementation approach`, `## Implementation tasks`, `## Acceptance Criteria`, `## Verification`, `## Related`, in that order. The agent's task breakdown, test plan, and security checklist are in `agent_tasking.md` (`design/AGENT_TASKING.md`).
+Layout: `design/HUMAN_SPECS.md` § Layout — a What / When / Owner header, then `## Problem`, `## Objective`, `## Requirements`, `## Scope`, `## Acceptance Criteria`, `## Verification`, `## Related`, in that order. `## Terms` is optional, directly after `## Objective`. The spec states what is required, never how the job is done. The agent's implementation approach, implementation tasks, test plan, and security checklist are in `agent_tasking.md` (`design/AGENT_TASKING.md`).
 
 ### Rules
 
